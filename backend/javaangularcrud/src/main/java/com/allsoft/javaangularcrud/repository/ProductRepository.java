@@ -17,7 +17,8 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
   Optional<Product> findByIdAndStatusTrue(Long id);
 
   @Query("SELECT p FROM Product p " +
-          "WHERE (:nombre IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) " +
+          "WHERE p.status = true " +
+          "AND (:nombre IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))) " +
           "AND (:marca IS NULL OR p.marca = :marca) " +
           "AND (:categoria IS NULL OR p.categoria = :categoria) " +
           "ORDER BY p.precio DESC")

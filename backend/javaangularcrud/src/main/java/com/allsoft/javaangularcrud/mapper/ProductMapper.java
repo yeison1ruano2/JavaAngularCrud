@@ -1,27 +1,33 @@
 package com.allsoft.javaangularcrud.mapper;
 
 import com.allsoft.javaangularcrud.dto.ProductDto;
+import com.allsoft.javaangularcrud.dto.ProductImageDto;
 import com.allsoft.javaangularcrud.entity.Product;
+import com.allsoft.javaangularcrud.entity.ProductImage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class ProductMapper {
+  private final ProductImageMapper productImageMapper;
+
+  public ProductMapper(ProductImageMapper productImageMapper) {
+    this.productImageMapper = productImageMapper;
+  }
 
   public Product dtoToEntity(ProductDto productDto){
     return new Product(
-            productDto.nombre(),
-            productDto.descripcion(),
-            productDto.precio(),
-            productDto.stock(),
-            productDto.categoria(),
-            productDto.marca(),
-            productDto.imagenes()
+            productDto.getNombre(),
+            productDto.getDescripcion(),
+            productDto.getPrecio(),
+            productDto.getStock(),
+            productDto.getCategoria(),
+            productDto.getMarca()
     );
   }
 
-  public ProductDto entityToDto(Product product){
+  public ProductDto entityToDto(Product product,List<ProductImageDto> listProductImageDto){
     return new ProductDto(
             product.getNombre(),
             product.getDescripcion(),
@@ -29,7 +35,7 @@ public class ProductMapper {
             product.getStock(),
             product.getCategoria(),
             product.getMarca(),
-            product.getImagenes(),
+            listProductImageDto,
             product.getStatus()
     );
   }
@@ -37,18 +43,21 @@ public class ProductMapper {
 
   public List<ProductDto> entityListToDtoList(List<Product> products){
     return products.stream()
-            .map(this::entityToDto)
+            .map(product -> {
+              List<ProductImageDto> listProductImageDto =  this.productImageMapper.entityListToDtoList(product.getImagenes());
+              return entityToDto(product,listProductImageDto);
+            })
             .toList();
   }
 
-  public Product entityUpdate(Product productDb, ProductDto productDto) {
-    productDb.setNombre(productDto.nombre());
-    productDb.setDescripcion(productDto.descripcion());
-    productDb.setPrecio(productDto.precio());
-    productDb.setStock(productDto.stock());
-    productDb.setCategoria(productDto.categoria());
-    productDb.setMarca(productDto.marca());
-    productDb.setImagenes(productDto.imagenes());
+  public Product entityUpdate(Product productDb, ProductDto productDto,List<ProductImage> listProductImage) {
+    productDb.setNombre(productDto.getNombre());
+    productDb.setDescripcion(productDto.getDescripcion());
+    productDb.setPrecio(productDto.getPrecio());
+    productDb.setStock(productDto.getStock());
+    productDb.setCategoria(productDto.getCategoria());
+    productDb.setMarca(productDto.getMarca());
+    productDb.setImagenes(listProductImage);
     return productDb;
   }
 }

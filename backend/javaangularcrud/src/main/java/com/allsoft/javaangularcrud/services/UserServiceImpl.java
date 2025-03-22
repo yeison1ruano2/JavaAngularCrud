@@ -127,6 +127,6 @@ public class UserServiceImpl implements UserService{
 
   @Override
   public List<ProductDto> findByTerm(ProductDto productDto) {
-    return this.productMapper.entityListToDtoList(this.productRepository.findByTerm(productDto.nombre(),productDto.marca(),productDto.categoria()));
+    return this.productMapper.entityListToDtoList(this.productRepository.findByTerm(productDto.getNombre(),productDto.getMarca(),productDto.getCategoria()));
   }
 }
