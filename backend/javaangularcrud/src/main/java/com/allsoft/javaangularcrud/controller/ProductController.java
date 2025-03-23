@@ -3,6 +3,7 @@ package com.allsoft.javaangularcrud.controller;
 import com.allsoft.javaangularcrud.dto.ProductDto;
 import com.allsoft.javaangularcrud.dto.ProductImageDto;
 import com.allsoft.javaangularcrud.services.ProductService;
+import com.allsoft.javaangularcrud.services.ProductServiceImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +17,7 @@ public class ProductController {
 
   private final ProductService productService;
 
-  public ProductController(ProductService productService) {
+  public ProductController(ProductServiceImpl productService) {
     this.productService = productService;
   }
 
@@ -27,12 +28,18 @@ public class ProductController {
       return this.productService.saveProduct(productDto,images);
   }
 
-  @PutMapping(consumes="multipart/form-data",  value="/{id}")
-  public ResponseEntity<Map<String,String>> updateProduct(@PathVariable Long id,
-                                                          @RequestParam("product") String productDto,
-                                                          @RequestPart("images") List<MultipartFile> images)
+  @PutMapping("/{id}")
+  public ResponseEntity<Map<String,String>> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto)
   {
-    return this.productService.updateProduct(id,productDto,images);
+    return this.productService.updateProduct(id,productDto);
+  }
+
+  @PutMapping(consumes="multipart/form-data",value="/updateImage/{productId}")
+  public ResponseEntity<Map<String,String>> updateImages(
+          @PathVariable Long productId,
+          @RequestPart("images") List<MultipartFile> images)
+  {
+    return this.productService.updateImages(images,productId);
   }
 
   @GetMapping

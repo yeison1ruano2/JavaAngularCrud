@@ -16,30 +16,30 @@ public class UserMapper {
     this.passwordEncoder = passwordEncoder;
   }
 
-  public User dtoToEntityCreate(UserDto userDto, Role role){
+  public User dtoToEntityCreate(UserDto userDto,Role role){
     return new User(
-            userDto.nombre(),
-            userDto.apellido(),
-            userDto.email(),
-            userDto.direccion(),
-            userDto.numCell(),
-            userDto.username(),
-            passwordEncoder.encode(userDto.password()),
+            userDto.getNombre(),
+            userDto.getApellido(),
+            userDto.getEmail(),
+            userDto.getDireccion(),
+            userDto.getNumCell(),
+            userDto.getUsername(),
+            passwordEncoder.encode(userDto.getPassword()),
             Collections.singleton(role)
     );
   }
 
   public User dtoToEntityUpdate(UserDto userDto, User user) {
-    user.setNombre(userDto.nombre());
-    user.setApellido(userDto.apellido());
-    user.setDireccion(userDto.direccion());
-    user.setEmail(userDto.email());
-    user.setNumCell(userDto.numCell());
+    user.setNombre(userDto.getNombre());
+    user.setApellido(userDto.getApellido());
+    user.setDireccion(userDto.getDireccion());
+    user.setEmail(userDto.getEmail());
+    user.setNumCell(userDto.getNumCell());
     return user;
   }
 
   public User dtoToEntityChangePassword(User user, UserDto userDto) {
-    user.setPassword(userDto.password());
+    user.setPassword(passwordEncoder.encode(userDto.getPassword()));
     return user;
   }
 }

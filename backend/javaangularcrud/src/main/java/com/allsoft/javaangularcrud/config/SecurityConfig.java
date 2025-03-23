@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
+  private static final String RUTAPRODUCTO = "/api/productos/**";
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
   public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
@@ -31,10 +32,12 @@ public class SecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/authUser/**","/api/authSeller/**").permitAll()
                     .requestMatchers("/api/user/**").authenticated()
-                    .requestMatchers("/api/productos/**").permitAll()
-                    .requestMatchers(HttpMethod.POST,"/api/vendedor/**").hasRole(RoleName.VENDEDOR.name())
+                    .requestMatchers(HttpMethod.GET, RUTAPRODUCTO).hasAnyRole(RoleName.VENDEDOR.name(), RoleName.ADMIN.name(), RoleName.CLIENTE.name())
+                    .requestMatchers(HttpMethod.POST, RUTAPRODUCTO).hasAnyRole(RoleName.VENDEDOR.name(), RoleName.ADMIN.name(), RoleName.CLIENTE.name())
+                    .requestMatchers(HttpMethod.PUT, RUTAPRODUCTO).hasAnyRole(RoleName.VENDEDOR.name(), RoleName.ADMIN.name())
+                    .requestMatchers(HttpMethod.DELETE, RUTAPRODUCTO).hasAnyRole(RoleName.VENDEDOR.name(), RoleName.ADMIN.name())
                     .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

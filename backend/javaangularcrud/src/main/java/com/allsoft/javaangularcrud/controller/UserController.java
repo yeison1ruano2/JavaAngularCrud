@@ -1,12 +1,10 @@
 package com.allsoft.javaangularcrud.controller;
 
-import com.allsoft.javaangularcrud.dto.ProductDto;
 import com.allsoft.javaangularcrud.dto.UserDto;
 import com.allsoft.javaangularcrud.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -33,15 +31,5 @@ public class UserController {
           @RequestBody UserDto userDto
   ){
     return this.userService.changePassword(authHeader,userDto);
-  }
-
-  @GetMapping("/product")
-  public ResponseEntity<List<ProductDto>> findAllProduct(){
-    return ResponseEntity.ok(this.userService.findAllProduct());
-  }
-
-  @PostMapping("/search")
-  public ResponseEntity<List<ProductDto>> findByTerm(@RequestBody ProductDto productDto){
-    return ResponseEntity.ok(this.userService.findByTerm(productDto));
   }
 }

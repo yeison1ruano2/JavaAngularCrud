@@ -3,7 +3,6 @@ package com.allsoft.javaangularcrud.mapper;
 import com.allsoft.javaangularcrud.dto.ProductDto;
 import com.allsoft.javaangularcrud.dto.ProductImageDto;
 import com.allsoft.javaangularcrud.entity.Product;
-import com.allsoft.javaangularcrud.entity.ProductImage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,14 +49,13 @@ public class ProductMapper {
             .toList();
   }
 
-  public Product entityUpdate(Product productDb, ProductDto productDto,List<ProductImage> listProductImage) {
+  public Product entityUpdate(Product productDb, ProductDto productDto) {
     productDb.setNombre(productDto.getNombre());
     productDb.setDescripcion(productDto.getDescripcion());
     productDb.setPrecio(productDto.getPrecio());
     productDb.setStock(productDto.getStock());
     productDb.setCategoria(productDto.getCategoria());
     productDb.setMarca(productDto.getMarca());
-    productDb.setImagenes(listProductImage);
     return productDb;
   }
 }

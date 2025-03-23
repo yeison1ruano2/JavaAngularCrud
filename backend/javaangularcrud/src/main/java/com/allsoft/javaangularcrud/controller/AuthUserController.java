@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/auth")
-public class AuthController {
+@RequestMapping("/api/authUser")
+public class AuthUserController {
 
   private final UserService userService;
 
-  public AuthController(UserService userService) {
+  public AuthUserController(UserService userService) {
     this.userService = userService;
   }
 
@@ -24,7 +24,7 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Map<String, String>> login(@RequestBody AuthDto authDto) {
+  public ResponseEntity<Map<String, String>> loginUser(@RequestBody AuthDto authDto) {
     return this.userService.loginUser(authDto);
   }
 
