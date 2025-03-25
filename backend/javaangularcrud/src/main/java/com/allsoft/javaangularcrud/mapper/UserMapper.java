@@ -1,6 +1,7 @@
 package com.allsoft.javaangularcrud.mapper;
 
 import com.allsoft.javaangularcrud.dto.UserDto;
+import com.allsoft.javaangularcrud.entity.Cart;
 import com.allsoft.javaangularcrud.entity.Role;
 import com.allsoft.javaangularcrud.entity.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +26,8 @@ public class UserMapper {
             userDto.getNumCell(),
             userDto.getUsername(),
             passwordEncoder.encode(userDto.getPassword()),
-            Collections.singleton(role)
+            Collections.singleton(role),
+            new Cart()
     );
   }
 

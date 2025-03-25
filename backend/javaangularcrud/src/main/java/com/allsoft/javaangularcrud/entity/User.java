@@ -47,10 +47,14 @@ public class User {
   )
   private Set<Role> roles;
 
+  @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
+  private Cart cart;
+
   public User() {}
 
   public User(String nombre, String apellido, String email, String direccion,
-              String numCell, String username, String password, Set<Role> roles) {
+              String numCell, String username, String password, Set<Role> roles,
+              Cart cart) {
     this.nombre = nombre;
     this.apellido = apellido;
     this.email = email;
@@ -59,6 +63,7 @@ public class User {
     this.username = username;
     this.password = password;
     this.roles = roles;
+    this.cart = cart;
   }
 
   public Long getId() {
@@ -131,5 +136,13 @@ public class User {
 
   public void setRoles(Set<Role> roles) {
     this.roles = roles;
+  }
+
+  public Cart getCart() {
+    return cart;
+  }
+
+  public void setCart(Cart cart) {
+    this.cart = cart;
   }
 }

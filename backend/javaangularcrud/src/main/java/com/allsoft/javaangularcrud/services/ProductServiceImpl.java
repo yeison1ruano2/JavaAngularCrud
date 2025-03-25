@@ -151,7 +151,7 @@ public class ProductServiceImpl implements ProductService{
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(productDto);
       }
     }catch(Exception e){
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(productDto);
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).body(productDto);
     }
   }
 

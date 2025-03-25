@@ -33,6 +33,7 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/authUser/**","/api/authSeller/**").permitAll()
+                    .requestMatchers("/api/cart/**").permitAll()
                     .requestMatchers("/api/user/**").authenticated()
                     .requestMatchers(HttpMethod.GET, RUTAPRODUCTO).hasAnyRole(RoleName.VENDEDOR.name(), RoleName.ADMIN.name(), RoleName.CLIENTE.name())
                     .requestMatchers(HttpMethod.POST, RUTAPRODUCTO).hasAnyRole(RoleName.VENDEDOR.name(), RoleName.ADMIN.name(), RoleName.CLIENTE.name())

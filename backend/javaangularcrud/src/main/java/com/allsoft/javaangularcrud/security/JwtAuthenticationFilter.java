@@ -1,6 +1,7 @@
 package com.allsoft.javaangularcrud.security;
 
 import com.allsoft.javaangularcrud.services.JwtService;
+import io.micrometer.common.lang.NonNullApi;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Component
+@NonNullApi
 public class JwtAuthenticationFilter  extends OncePerRequestFilter {
 
   private final JwtService jwtService;

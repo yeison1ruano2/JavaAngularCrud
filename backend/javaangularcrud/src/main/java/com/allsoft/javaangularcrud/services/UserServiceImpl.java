@@ -80,9 +80,8 @@ public class UserServiceImpl implements UserService{
       response.put(MESSAGE,"Usuario no registrado");
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
-    List<RoleName> roles = List.of(RoleName.CLIENTE);
     if (passwordEncoder.matches(authDto.getPassword(), user.get().getPassword())) {
-      String token = jwtService.generateToken(user.get().getUsername(),user.get().getId(),roles);
+      String token = jwtService.generateToken(user.get().getUsername());
       response.put("token", token);
       return ResponseEntity.ok(response);
     } else {
@@ -94,9 +93,8 @@ public class UserServiceImpl implements UserService{
     Map<String, String> response = new HashMap<>();
     try {
       String token = authHeader.substring(7);
-      Long userId = jwtService.getUserIdFromToken(token);
       String username = jwtService.getUsernameFromToken(token);
-      User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("Usuario no encontrado"));
+      User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("Usuario no encontrado"));
       if(!user.getUsername().equals(username)){
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"El nombre de usuario no coincide con el token");
       }
@@ -118,9 +116,8 @@ public class UserServiceImpl implements UserService{
     }
     try {
       String token = authHeader.substring(7);
-      Long userId = jwtService.getUserIdFromToken(token);
       String username = jwtService.getUsernameFromToken(token);
-      User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("Usuario no encontrado"));
+      User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("Usuario no encontrado"));
       if(!user.getUsername().equals(username)){
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"El username no coincide con el token");
       }
