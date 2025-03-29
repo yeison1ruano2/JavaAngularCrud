@@ -1,8 +1,10 @@
 package com.allsoft.javaangularcrud.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 import java.util.Set;
 
@@ -27,16 +29,20 @@ public class User {
   @Email(message = "Debe proporcionar un correo válido")
   private String email;
 
-  @Column(nullable = true)
+  @Column(nullable = false)
   private String direccion;
 
   @Column(nullable = false, unique = true)
+  @NotEmpty(message = "El numero de celular no puede estar vacio")
   private String numCell;
 
   @Column(nullable = false, unique = true)
+  @NotEmpty(message = "El nombre de usuario no puede estar vacio")
   private String username;
 
   @Column(nullable = false)
+  @NotEmpty(message = "La contraseña no puede estar vacio")
+  @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
   private String password;
 
   @ManyToMany(fetch = FetchType.EAGER)
@@ -47,7 +53,8 @@ public class User {
   )
   private Set<Role> roles;
 
-  @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
+  @OneToOne(mappedBy = "user",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  @JsonManagedReference
   private Cart cart;
 
   public User() {}

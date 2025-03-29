@@ -81,12 +81,18 @@ public class UserServiceImpl implements UserService{
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
     if (passwordEncoder.matches(authDto.getPassword(), user.get().getPassword())) {
-      String token = jwtService.generateToken(user.get().getUsername());
+      String roleUser = getRoleUser(user.get().getId());
+      String token = jwtService.generateToken(user.get().getUsername(),roleUser);
       response.put("token", token);
       return ResponseEntity.ok(response);
     } else {
       return ResponseEntity.status(401).body(Map.of(ERROR, "Credenciales inválidas"));
     }
+  }
+
+  private String getRoleUser(Long userId) {
+    List<RoleName> roleUsers = userRepository.findRoleByUserId(userId);
+    return roleUsers.getFirst().name();
   }
 
   public ResponseEntity<Map<String, String>> updateUser(String authHeader, UserDto userDto) {

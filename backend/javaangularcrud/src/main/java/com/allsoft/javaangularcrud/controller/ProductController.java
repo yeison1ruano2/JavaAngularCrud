@@ -5,6 +5,7 @@ import com.allsoft.javaangularcrud.dto.ProductImageDto;
 import com.allsoft.javaangularcrud.services.ProductService;
 import com.allsoft.javaangularcrud.services.ProductServiceImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,20 +23,20 @@ public class ProductController {
   }
 
   @PostMapping(consumes="multipart/form-data",value="/save")
-  public ResponseEntity<Map<String,String>> saveProduct(
+  public ResponseEntity<ProductDto> saveProduct(
           @RequestParam("product") String productDto,
           @RequestPart("images") List<MultipartFile> images){
       return this.productService.saveProduct(productDto,images);
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<Map<String,String>> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto)
+  public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto)
   {
     return this.productService.updateProduct(id,productDto);
   }
 
   @PutMapping(consumes="multipart/form-data",value="/updateImage/{productId}")
-  public ResponseEntity<Map<String,String>> updateImages(
+  public ResponseEntity<List<ProductImageDto>> updateImages(
           @PathVariable Long productId,
           @RequestPart("images") List<MultipartFile> images)
   {
@@ -43,9 +44,7 @@ public class ProductController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ProductDto>> findAllProduct(){
-    return this.productService.findAllProduct();
-  }
+  public ResponseEntity<List<ProductDto>> findAllProduct(){return this.productService.findAllProduct();}
 
   @GetMapping("/{id}")
   public ResponseEntity<ProductDto> findById(@PathVariable Long id){
@@ -53,6 +52,7 @@ public class ProductController {
   }
 
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasAnyRole('VENDEDOR', 'ADMIN')")
   public ResponseEntity<Map<String,String>> deleteProduct(@PathVariable Long id){
     return this.productService.deleteProduct(id);
   }

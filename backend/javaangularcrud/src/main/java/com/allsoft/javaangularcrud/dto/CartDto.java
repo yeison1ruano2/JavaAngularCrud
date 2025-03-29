@@ -1,13 +1,14 @@
 package com.allsoft.javaangularcrud.dto;
 
-import java.util.Set;
+import java.util.List;
 
 public class CartDto {
 
   private UserDto user;
-  private Set<CartItemDto> items;
+  private List<CartItemDto> items;
+  private String message;
 
-  public CartDto(UserDto user, Set<CartItemDto> items) {
+  public CartDto(UserDto user, List<CartItemDto> items) {
     this.items = items;
     this.user = user;
   }
@@ -15,11 +16,15 @@ public class CartDto {
   public CartDto() {
   }
 
-  public Set<CartItemDto> getItems() {
+  public CartDto(String message) {
+    this.message = message;
+  }
+
+  public List<CartItemDto> getItems() {
     return items;
   }
 
-  public void setItems(Set<CartItemDto> items) {
+  public void setItems(List<CartItemDto> items) {
     this.items = items;
   }
 
@@ -29,5 +34,13 @@ public class CartDto {
 
   public void setUser(UserDto user) {
     this.user = user;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
   }
 }

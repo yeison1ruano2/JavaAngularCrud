@@ -1,8 +1,9 @@
 package com.allsoft.javaangularcrud.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name="carts")
@@ -14,12 +15,13 @@ public class Cart {
 
   @OneToOne
   @JoinColumn(name="user_id",nullable = false)
+  @JsonBackReference
   private User user;
 
   @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL,orphanRemoval = true)
-  private Set<CartItem> items;
+  private List<CartItem> items;
 
-  public Cart(Long id, Set<CartItem> items, User user) {
+  public Cart(Long id, List<CartItem> items, User user) {
     this.id = id;
     this.items = items;
     this.user = user;
@@ -36,11 +38,11 @@ public class Cart {
     this.id = id;
   }
 
-  public Set<CartItem> getItems() {
+  public List<CartItem> getItems() {
     return items;
   }
 
-  public void setItems(Set<CartItem> items) {
+  public void setItems(List<CartItem> items) {
     this.items = items;
   }
 

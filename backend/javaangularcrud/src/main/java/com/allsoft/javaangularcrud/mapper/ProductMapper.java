@@ -39,6 +39,18 @@ public class ProductMapper {
     );
   }
 
+  public ProductDto entityToDtoUpdateProduct(Product product){
+    return new ProductDto(
+            product.getNombre(),
+            product.getDescripcion(),
+            product.getPrecio(),
+            product.getStock(),
+            product.getCategoria(),
+            product.getMarca(),
+            product.getStatus()
+    );
+  }
+
 
   public List<ProductDto> entityListToDtoList(List<Product> products){
     return products.stream()

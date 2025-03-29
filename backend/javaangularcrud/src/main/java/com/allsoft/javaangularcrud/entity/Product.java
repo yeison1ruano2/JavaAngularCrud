@@ -2,6 +2,7 @@ package com.allsoft.javaangularcrud.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
@@ -14,16 +15,22 @@ public class Product {
   private Long id;
 
   @Column(nullable = false, length = 100)
+  @NotEmpty(message = "El nombre no puede estar vacío")
   private String nombre;
   @Column(nullable = false, columnDefinition = "TEXT")
+  @NotEmpty(message = "La descripcion no puede estar vacío")
   private String descripcion;
   @Column(nullable = false)
+  @NotEmpty(message = "El precio no puede estar vacío")
   private Double precio;
   @Column(nullable = false)
+  @NotEmpty(message = "El stock no puede estar vacío")
   private Integer stock;
   @Column(nullable = false, length = 50)
+  @NotEmpty(message = "La categoria no puede estar vacío")
   private String categoria;
   @Column(length = 50)
+  @NotEmpty(message = "La marca no puede estar vacío")
   private String marca;
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JsonManagedReference

@@ -1,6 +1,7 @@
 package com.allsoft.javaangularcrud.controller;
 
 import com.allsoft.javaangularcrud.dto.CartDto;
+import com.allsoft.javaangularcrud.dto.CartRequest;
 import com.allsoft.javaangularcrud.dto.UserDto;
 import com.allsoft.javaangularcrud.services.CartService;
 import org.springframework.http.ResponseEntity;
@@ -17,23 +18,25 @@ public class CartController {
     this.cartService = cartService;
   }
 
-  @GetMapping
+  @PostMapping("/get")
   public ResponseEntity<CartDto> getCart(@RequestBody UserDto userDto){
     return cartService.getCart(userDto);
   }
 
   @PostMapping("/add")
-  public ResponseEntity<CartDto> addProductToCart(@RequestBody UserDto userDto,
-                                                             @RequestParam Long productId,
-                                                             @RequestParam int cantidad)
+  public ResponseEntity<CartDto> addProductToCart(@RequestBody CartRequest cartRequest)
   {
-    return cartService.addProductToCart(userDto,productId,cantidad);
+    return cartService.addProductToCart(cartRequest);
+  }
+
+  @PostMapping("/decrease")
+  public ResponseEntity<CartDto> decreaseProductQuantityInCart(@RequestBody CartRequest cartRequest)
+  {
+    return cartService.decreaseProductQuantityInCart(cartRequest);
   }
 
   @DeleteMapping("/remove")
-  public ResponseEntity<CartDto> removeProductFromCart(@RequestBody UserDto userDto, @RequestParam Long productId){
-    return cartService.removeProductFromCart(userDto,productId);
+  public ResponseEntity<CartDto> removeProductFromCart(@RequestBody CartRequest cartRequest){
+    return cartService.removeProductFromCart(cartRequest);
   }
-
-
 }

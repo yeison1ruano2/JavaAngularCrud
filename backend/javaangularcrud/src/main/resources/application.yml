@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/javaangularcrud
+    username: root
+    password: root
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/javaangularcrud
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+keycloak:
+  realm: javaangularcrud
+  auth-server-url: http://localhost:9090/
+  resource: backend
+  credentials:
+    secret: oehLrigLvMN69SQInTnEYWrrIHYDc0Bc
+  principal-attribute: preferred_username
+
+
+server:
+  error:
+    include-message: always
+file:
+  uploads-dir: "src/main/java/com/allsoft/javaangularcrud/uploads"
+
+paypal:
+  client:
+    id: AZO3dSNNJEZ4Ah9q7lme7MjELdaPVdfS9Jqjb9kGlSIewEZnoOuq83TFZSifkX8k_t_cBdGvY-0oWIYA
+    secret: EPBRhZ_aBN44mrL-DUbKp_DLXbWVszEitpokkTMyVAf5ZCRu1AD8KeG2_0Hwe1B2SWn-mnwyd2WJGrLv
+  mode: sandbox
+

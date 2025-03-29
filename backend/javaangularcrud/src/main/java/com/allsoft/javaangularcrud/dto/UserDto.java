@@ -1,18 +1,37 @@
 package com.allsoft.javaangularcrud.dto;
 
 import com.allsoft.javaangularcrud.entity.RoleName;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 import java.util.Set;
 
 public class UserDto{
+  @NotEmpty(message = "El nombre no puede estar vacío")
   private String nombre;
+
+  @NotEmpty(message = "El apellido no puede estar vacío")
   private String apellido;
+
+  @NotEmpty(message = "El correo no puede estar vacío")
+  @Email(message = "Debe proporcionar un correo válido")
   private String email;
+
   private String direccion;
+
+  @NotEmpty(message = "El numero de celular no puede estar vacio")
   private String numCell;
+
+  @NotEmpty(message = "El nombre de usuario no puede estar vacio")
   private String username;
+
+  @NotEmpty(message = "La contraseña no puede estar vacio")
+  @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
   private String password;
+
   private String rePassword;
+
   private Set<RoleName> roles;
 
   public UserDto(String apellido, String direccion, String email, String nombre,
@@ -26,6 +45,16 @@ public class UserDto{
     this.password = password;
     this.rePassword = rePassword;
     this.roles = roles;
+    this.username = username;
+  }
+
+  public UserDto(String apellido, String direccion, String email, String nombre,
+                 String numCell,String username) {
+    this.apellido = apellido;
+    this.direccion = direccion;
+    this.email = email;
+    this.nombre = nombre;
+    this.numCell = numCell;
     this.username = username;
   }
 
