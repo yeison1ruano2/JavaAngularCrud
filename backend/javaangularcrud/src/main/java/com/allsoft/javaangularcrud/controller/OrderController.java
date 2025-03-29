@@ -2,6 +2,7 @@ package com.allsoft.javaangularcrud.controller;
 
 import com.allsoft.javaangularcrud.dto.OrderDto;
 import com.allsoft.javaangularcrud.dto.OrderRequest;
+import com.allsoft.javaangularcrud.dto.ProductDto;
 import com.allsoft.javaangularcrud.services.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +24,14 @@ public class OrderController {
     return orderService.getAllOrders();
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<OrderDto> getOrderById(@PathVariable Long id){
-    return orderService.getOrderById(id);
+  @PostMapping("/order/user")
+  public ResponseEntity<List<OrderDto>> getOrderByUser(@RequestBody OrderRequest orderRequest){
+    return orderService.getOrderByUser(orderRequest);
+  }
+
+  @PostMapping("/order/product")
+  public ResponseEntity<List<OrderDto>> getOrderByProduct(@RequestBody ProductDto productDto){
+    return orderService.getOrderByProduct(productDto);
   }
 
   @PostMapping

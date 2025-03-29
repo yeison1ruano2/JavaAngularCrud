@@ -47,6 +47,14 @@ public class ProductDto{
     this.status = status;
   }
 
+  public ProductDto(String nombre, String descripcion,  String categoria, String marca,Boolean status) {
+    this.nombre = nombre;
+    this.descripcion = descripcion;
+    this.categoria = categoria;
+    this.marca = marca;
+    this.status = status;
+  }
+
 
   public ProductDto() {
   }

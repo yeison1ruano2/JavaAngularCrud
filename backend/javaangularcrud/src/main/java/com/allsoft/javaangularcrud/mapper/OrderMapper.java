@@ -1,6 +1,7 @@
 package com.allsoft.javaangularcrud.mapper;
 
 import com.allsoft.javaangularcrud.dto.OrderDto;
+import com.allsoft.javaangularcrud.dto.OrderItemDto;
 import com.allsoft.javaangularcrud.entity.Order;
 import com.allsoft.javaangularcrud.entity.OrderItem;
 import com.allsoft.javaangularcrud.entity.User;
@@ -19,19 +20,17 @@ public class OrderMapper {
 
 
   public OrderDto entityToDto(Order order){
-    /*OrderDto orderDto = new OrderDto();
-    orderDto.setId(order.getId());
+    OrderDto orderDto = new OrderDto();
     orderDto.setItems(order.getItems().stream()
             .map(orderItemMapper::entityToDto)
             .toList());
     orderDto.setTotalAmount(order.getTotalAmount());
     orderDto.setStatus(order.getStatus());
-    orderDto.setUsername(order.getUser().getNombre() + order.getUser().getApellido());
-    return orderDto;*/
-    return new OrderDto();
+    orderDto.setUsername(order.getUser().getUsername());
+    return orderDto;
   }
 
-  public Order dtoToEntity(OrderDto orderDto){
+  /*public Order dtoToEntity(OrderDto orderDto){
     Order order = new Order();
     order.setId(orderDto.getId());
     order.setItems(orderDto.getItems().stream()
@@ -40,7 +39,7 @@ public class OrderMapper {
     order.setTotalAmount(orderDto.getTotalAmount());
     order.setStatus(orderDto.getStatus());
     return order;
-  }
+  }*/
 
   public Order createEntity(List<OrderItem> orderItems,Order order) {
     order.setItems(orderItems);
@@ -52,5 +51,24 @@ public class OrderMapper {
     order.setTotalAmount(totalAmount);
     order.setStatus("PAGADO");
     return order;
+  }
+
+
+  public List<OrderDto> entityListToDtoList(List<Order> listOrderUser) {
+    return listOrderUser.stream()
+            .map(this::entityToDto)
+            .toList();
+  }
+
+  public List<OrderDto> entityListToDtoListOrderItem(List<Order> listOrder, List<OrderItemDto> listOrderItemDto) {
+    return listOrder.stream()
+            .map(order->{
+              OrderDto orderDto = new OrderDto();
+              orderDto.setItems(listOrderItemDto);
+              orderDto.setTotalAmount(order.getTotalAmount());
+              orderDto.setStatus(order.getStatus());
+              orderDto.setUsername(order.getUser().getUsername());
+              return orderDto;
+            }).toList();
   }
 }

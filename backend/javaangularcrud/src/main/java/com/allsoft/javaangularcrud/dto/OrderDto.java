@@ -3,15 +3,13 @@ package com.allsoft.javaangularcrud.dto;
 import java.util.List;
 
 public class OrderDto {
-  private Long id;
   private List<OrderItemDto> items;
   private Double totalAmount;
   private String status;
   private String username;
   private String message;
 
-  public OrderDto(Long id, List<OrderItemDto> items, String status, Double totalAmount, String username, String message) {
-    this.id = id;
+  public OrderDto(List<OrderItemDto> items, String status, Double totalAmount, String username, String message) {
     this.items = items;
     this.status = status;
     this.totalAmount = totalAmount;
@@ -56,14 +54,6 @@ public class OrderDto {
 
   public void setUsername(String username) {
     this.username = username;
-  }
-
-  public Long getId() {
-    return this.id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
   }
 
   public String getMessage() {

@@ -1,27 +1,17 @@
 package com.allsoft.javaangularcrud.dto;
 
 public class OrderItemDto {
- private OrderDto orderDto;
  private ProductDto productDto;
  private Integer quantity;
  private Double price;
 
-  public OrderItemDto(OrderDto orderDto, Double price, ProductDto productDto, Integer quantity) {
-    this.orderDto = orderDto;
+  public OrderItemDto(Double price, ProductDto productDto, Integer quantity) {
     this.price = price;
     this.productDto = productDto;
     this.quantity = quantity;
   }
 
   public OrderItemDto() {
-  }
-
-  public OrderDto getOrderDto() {
-    return orderDto;
-  }
-
-  public void setOrderDto(OrderDto orderDto) {
-    this.orderDto = orderDto;
   }
 
   public Double getPrice() {

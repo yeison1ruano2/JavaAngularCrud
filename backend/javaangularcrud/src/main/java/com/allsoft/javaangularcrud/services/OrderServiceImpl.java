@@ -1,15 +1,13 @@
 package com.allsoft.javaangularcrud.services;
 
-import com.allsoft.javaangularcrud.dto.OrderDto;
-import com.allsoft.javaangularcrud.dto.OrderItemDto;
-import com.allsoft.javaangularcrud.dto.OrderItemRequest;
-import com.allsoft.javaangularcrud.dto.OrderRequest;
+import com.allsoft.javaangularcrud.dto.*;
 import com.allsoft.javaangularcrud.entity.Order;
 import com.allsoft.javaangularcrud.entity.OrderItem;
 import com.allsoft.javaangularcrud.entity.Product;
 import com.allsoft.javaangularcrud.entity.User;
 import com.allsoft.javaangularcrud.mapper.OrderItemMapper;
 import com.allsoft.javaangularcrud.mapper.OrderMapper;
+import com.allsoft.javaangularcrud.repository.OrderItemRepository;
 import com.allsoft.javaangularcrud.repository.OrderRepository;
 import com.allsoft.javaangularcrud.repository.ProductRepository;
 import com.allsoft.javaangularcrud.repository.UserRepository;
@@ -30,13 +28,15 @@ public class OrderServiceImpl implements OrderService {
   private final OrderMapper orderMapper;
   private final UserRepository userRepository;
   private final ProductRepository productRepository;
+  private final OrderItemRepository orderItemRepository;
   private final OrderItemMapper orderItemMapper;
 
-  public OrderServiceImpl(OrderRepository orderRepository, OrderMapper orderMapper, UserRepository userRepository, ProductRepository productRepository, OrderItemMapper orderItemMapper) {
+  public OrderServiceImpl(OrderRepository orderRepository, OrderMapper orderMapper, UserRepository userRepository, ProductRepository productRepository, OrderItemRepository orderItemRepository, OrderItemMapper orderItemMapper) {
     this.orderRepository = orderRepository;
     this.orderMapper = orderMapper;
     this.userRepository = userRepository;
     this.productRepository = productRepository;
+    this.orderItemRepository = orderItemRepository;
     this.orderItemMapper = orderItemMapper;
   }
 
@@ -54,16 +54,37 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public ResponseEntity<OrderDto> getOrderById(Long id) {
+  public ResponseEntity<List<OrderDto>> getOrderByUser(OrderRequest orderRequest) {
     try {
-      Optional<Order> order = orderRepository.findById(id);
-      if(order.isEmpty()){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new OrderDto("Orden no encontrada"));
+      List<Order> listOrderUser =  orderRepository.findOrderByUser(orderRequest.getUsername());
+      if(listOrderUser.isEmpty()){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of(new OrderDto("Usuario no encontrado")));
       }
-      OrderDto orderDto = orderMapper.entityToDto(order.get());
-      return ResponseEntity.status(HttpStatus.OK).body(orderDto);
+      List<OrderDto> listOrderDto = orderMapper.entityListToDtoList(listOrderUser);
+      return ResponseEntity.status(HttpStatus.OK).body(listOrderDto);
     }catch(Exception e){
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new OrderDto("Ocurrio un error, intentalo de nuevo"));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of());
+    }
+  }
+
+  @Override
+  public ResponseEntity<List<OrderDto>> getOrderByProduct(ProductDto productDto) {
+    try {
+      Optional<Product> optionalProduct =  productRepository.findByNombreAndStatusTrue(productDto.getNombre());
+      if(optionalProduct.isEmpty()){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of(new OrderDto("Producto no encontrado")));
+      }
+      Product product = optionalProduct.get();
+      List<OrderItem> listOrderItemProduct =  orderItemRepository.findByProduct(product.getId());
+      List<Order> listOrder =   listOrderItemProduct.stream()
+              .map(orderItem -> {
+                return orderRepository.findOrderById(orderItem.getOrder().getId());
+              }).toList();
+      List<OrderItemDto> listOrderItemDto =  orderItemMapper.listEntityToDtoList(listOrderItemProduct);
+      List<OrderDto> listOrderDto = orderMapper.entityListToDtoListOrderItem(listOrder,listOrderItemDto);
+      return ResponseEntity.status(HttpStatus.OK).body(listOrderDto);
+    }catch(Exception e){
+      return ResponseEntity.status(HttpStatus.OK).body(null);
     }
   }
 
@@ -82,9 +103,10 @@ public class OrderServiceImpl implements OrderService {
       List<OrderItem> orderItems = createOrderItems(orderRequest.getItems(),order);
       Order orderSave = orderMapper.createEntity(orderItems,order);
       orderRepository.save(orderSave);
-      return ResponseEntity.status(HttpStatus.OK).body(new OrderDto());
+      OrderDto orderDto =  orderMapper.entityToDto(orderSave);
+      return ResponseEntity.status(HttpStatus.OK).body(orderDto);
     }catch(Exception e){
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new OrderDto("Error: " + e.getMessage()));
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new OrderDto("Error guardando la orden"));
     }
   }
 
@@ -108,4 +130,6 @@ public class OrderServiceImpl implements OrderService {
   public ResponseEntity<Map<String, String>> deleteOrder(Long id) {
     return null;
   }
+
+
 }

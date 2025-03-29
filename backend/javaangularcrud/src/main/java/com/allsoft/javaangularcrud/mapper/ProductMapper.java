@@ -70,4 +70,14 @@ public class ProductMapper {
     productDb.setMarca(productDto.getMarca());
     return productDb;
   }
+
+  public ProductDto onlyEntityToDto(Product product) {
+    return new ProductDto(
+            product.getNombre(),
+            product.getDescripcion(),
+            product.getCategoria(),
+            product.getMarca(),
+            product.getStatus()
+    );
+  }
 }
