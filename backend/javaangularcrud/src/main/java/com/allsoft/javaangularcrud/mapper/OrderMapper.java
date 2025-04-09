@@ -71,4 +71,15 @@ public class OrderMapper {
               return orderDto;
             }).toList();
   }
+
+  public OrderDto mapOrderToDto(Order order, OrderItem orderItem) {
+    OrderItemDto orderItemDto = orderItemMapper.entityToDto(orderItem);
+    return new OrderDto(
+            List.of(orderItemDto),
+            order.getStatus(),
+            order.getTotalAmount(),
+            order.getUser().getUsername(),
+            null
+    );
+  }
 }

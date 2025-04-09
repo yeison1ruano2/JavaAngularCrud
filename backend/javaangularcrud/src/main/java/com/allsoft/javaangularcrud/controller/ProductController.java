@@ -26,13 +26,13 @@ public class ProductController {
   public ResponseEntity<ProductDto> saveProduct(
           @RequestParam("product") String productDto,
           @RequestPart("images") List<MultipartFile> images){
-      return this.productService.saveProduct(productDto,images);
+      return productService.saveProduct(productDto,images);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto)
   {
-    return this.productService.updateProduct(id,productDto);
+    return productService.updateProduct(id,productDto);
   }
 
   @PutMapping(consumes="multipart/form-data",value="/updateImage/{productId}")
@@ -40,30 +40,25 @@ public class ProductController {
           @PathVariable Long productId,
           @RequestPart("images") List<MultipartFile> images)
   {
-    return this.productService.updateImages(images,productId);
+    return productService.updateImages(images,productId);
   }
 
   @GetMapping
-  public ResponseEntity<List<ProductDto>> findAllProduct(){return this.productService.findAllProduct();}
+  public ResponseEntity<List<ProductDto>> findAllProduct(){return productService.findAllProduct();}
 
-  @GetMapping("/{id}")
-  public ResponseEntity<ProductDto> findById(@PathVariable Long id){
-    return this.productService.findById(id);
-  }
-
-  @DeleteMapping("/{id}")
+  @DeleteMapping()
   @PreAuthorize("hasAnyRole('VENDEDOR', 'ADMIN')")
-  public ResponseEntity<Map<String,String>> deleteProduct(@PathVariable Long id){
-    return this.productService.deleteProduct(id);
+  public ResponseEntity<Map<String,String>> deleteProduct(@RequestBody ProductDto productDto){
+    return productService.deleteProduct(productDto);
   }
 
   @PostMapping("/search")
   public ResponseEntity<List<ProductDto>> findByName(@RequestBody ProductDto productDto){
-    return this.productService.findByFilters(productDto);
+    return productService.findByFilters(productDto);
   }
 
   @GetMapping("/{productId}/images")
   public ResponseEntity<List<ProductImageDto>> getProductImages(@PathVariable Long productId) {
-    return this.productService.getProductImages(productId);
+    return productService.getProductImages(productId);
   }
 }

@@ -36,14 +36,13 @@ public class CartServiceImpl implements CartService{
   public ResponseEntity<CartDto> getCart(UserDto userDto) {
     try {
       Optional<User> optionalUser = userRepository.findByUsername(userDto.getUsername());
-      if(optionalUser.isPresent()){
-        User user = optionalUser.get();
-        Cart cart = cartRepository.findByUserId(user.getId()).orElse(new Cart());
-        CartDto cartDto = this.cartMapper.entityToDto(cart);
-        return ResponseEntity.status(HttpStatus.OK).body(cartDto);
-      }else{
+      if(optionalUser.isEmpty()){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CartDto(USERNOTFOUND));
       }
+      User user = optionalUser.get();
+      Cart cart = cartRepository.findByUserId(user.getId()).orElse(new Cart());
+      CartDto cartDto = cartMapper.entityToDto(cart);
+      return ResponseEntity.status(HttpStatus.OK).body(cartDto);
     }catch(Exception e){
       return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new CartDto("Error al obtener el carrito"));
     }
@@ -66,7 +65,6 @@ public class CartServiceImpl implements CartService{
       if(cartRequest.getCantidad()<1 || cartRequest.getCantidad() > product.getStock()){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CartDto("Cantidad no Valida"));
       }
-      
       addUpdateCartItem(cart,product,cartRequest.getCantidad());
       cartRepository.save(cart);
       CartDto cartDto = this.cartMapper.entityToDto(cart);
@@ -78,7 +76,7 @@ public class CartServiceImpl implements CartService{
 
   private void addUpdateCartItem(Cart cart, Product product, int cantidad) {
     Optional<CartItem> optionalCartItem = cart.getItems().stream()
-            .filter(item -> item.getProduct().getId().equals(product.getId()))
+            .filter(item -> item.getProductId().equals(product.getId()))
             .findFirst();
     CartItem cartItem;
     if(optionalCartItem.isPresent()){
@@ -91,7 +89,7 @@ public class CartServiceImpl implements CartService{
     }else{
       cartItem = new CartItem();
       cartItem.setCart(cart);
-      cartItem.setProduct(product);
+      cartItem.setProductId(product.getId());
       cartItem.setCantidad(cantidad);
       cart.getItems().add(cartItem);
     }
@@ -120,40 +118,49 @@ public class CartServiceImpl implements CartService{
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CartDto("Producto no encontrado"));
       }
       Product product = optionalProduct.get();
-      Optional<CartItem> optionalCartItem = cart.getItems().stream()
-                .filter(item -> item.getProduct().getId().equals(product.getId()))
-                .findFirst();
-      CartItem cartItem;
+      Optional<CartItem> optionalCartItem = mapCartItemCart(cart,product);
       if(optionalCartItem.isEmpty()){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CartDto("Producto no encontrado en el carrito"));
       }
-      cartItem = optionalCartItem.get();
-      int newQuantity = cartItem.getCantidad()-cartRequest.getCantidad();
-      if(newQuantity >0){
-        cartItem.setCantidad(newQuantity);
-      }else{
-        cart.getItems().remove(cartItem);
-      }
+      CartItem cartItem = optionalCartItem.get();
+      mapQuantityCartItem(cartItem,cartRequest,cart);
       cartRepository.save(cart);
-      CartDto cartDto = this.cartMapper.entityToDto(cart);
+      CartDto cartDto = cartMapper.entityToDto(cart);
       return ResponseEntity.status(HttpStatus.OK).body(cartDto);
     }catch (Exception e){
       return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new CartDto("Error al disminuir la cantidad del producto en el carrito"));
     }
   }
 
+  private void mapQuantityCartItem(CartItem cartItem, CartRequest cartRequest, Cart cart) {
+    int newQuantity = cartItem.getCantidad()-cartRequest.getCantidad();
+    if(newQuantity >0){
+      cartItem.setCantidad(newQuantity);
+    }else{
+      cart.getItems().remove(cartItem);
+    }
+  }
+
+  private Optional<CartItem> mapCartItemCart(Cart cart,Product product) {
+    return cart.getItems().stream().filter(item -> item.getProductId().equals(product.getId()))
+            .findFirst();
+  }
+
   @Override
-  public ResponseEntity<CartDto> removeProductFromCart(CartRequest cartRequest) {
+  public ResponseEntity<CartDto>  removeProductFromCart(CartRequest cartRequest) {
     try {
       Optional<User> optionalUser = userRepository.findByUsername(cartRequest.getUsername());
       if(optionalUser.isEmpty()){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CartDto(USERNOTFOUND));
       }
+
       User user = optionalUser.get();
       Cart cart = cartRepository.findById(user.getCart().getId()).orElse(new Cart());
-      Optional<CartItem> optionalCartItem = cart.getItems().stream()
-                .filter(item -> item.getProduct().getNombre().equals(cartRequest.getNameProduct()))
-                .findFirst();
+      Optional<Product> optionalProduct = productRepository.findByNombreAndStatusTrue(cartRequest.getNameProduct());
+      if(optionalProduct.isEmpty()){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CartDto("Producto no encontrado"));
+      }
+      Optional<CartItem> optionalCartItem = mapCartItemCart(cart,optionalProduct.get());
       if(optionalCartItem.isPresent()){
           CartItem cartItem = optionalCartItem.get();
           cart.getItems().remove(cartItem);

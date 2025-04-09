@@ -2,12 +2,20 @@ package com.allsoft.javaangularcrud.mapper;
 
 import com.allsoft.javaangularcrud.dto.*;
 import com.allsoft.javaangularcrud.entity.*;
+import com.allsoft.javaangularcrud.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CartMapper {
+
+  private final ProductRepository productRepository;
+
+  public CartMapper(ProductRepository productRepository) {
+    this.productRepository = productRepository;
+  }
 
   public CartDto entityToDto(Cart cart) {
     List<CartItemDto> cartItemDtos = cart.getItems().stream()
@@ -18,7 +26,8 @@ public class CartMapper {
   }
 
   public CartItemDto convertToDto(CartItem cartItem) {
-    ProductDto productDto = convertToDto(cartItem.getProduct());
+    Optional<Product> optionalProduct = productRepository.findByNombreAndStatusTrue(cartItem.getProductId().toString());
+    ProductDto productDto = convertToDto(optionalProduct.get());
     return new CartItemDto(productDto, cartItem.getCantidad());
   }
 

@@ -13,8 +13,7 @@ public interface ProductService {
   ResponseEntity<ProductDto> updateProduct(Long id, ProductDto productDto);
   ResponseEntity<List<ProductImageDto>> updateImages(List<MultipartFile> images,Long productId);
   ResponseEntity<List<ProductDto>> findAllProduct();
-  ResponseEntity<ProductDto> findById(Long id);
-  ResponseEntity<Map<String,String>> deleteProduct(Long id);
+  ResponseEntity<Map<String,String>> deleteProduct(ProductDto productDto);
   ResponseEntity<List<ProductDto>> findByFilters(ProductDto productDto);
   ResponseEntity<List<ProductImageDto>> getProductImages(Long productId);
 }

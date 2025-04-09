@@ -42,13 +42,13 @@ public class ProductServiceImpl implements ProductService{
 
   public ResponseEntity<ProductDto> saveProduct(String productDto, List<MultipartFile> images) {
     try {
-      ProductDto productDtoConvert = this.objectMapper.readValue(productDto,ProductDto.class);
-      Product product = this.productMapper.dtoToEntity(productDtoConvert);
+      ProductDto productDtoConvert = objectMapper.readValue(productDto,ProductDto.class);
+      Product product = productMapper.dtoToEntity(productDtoConvert);
       this.productRepository.save(product);
-      List<ProductImage> productImages = this.saveImageProduct(images,product);
+      List<ProductImage> productImages = saveImageProduct(images,product);
       product.setImagenes(productImages);
       List<ProductImageDto> listProductImagesDto = productImageMapper.entityListToDtoList(productImages);
-      ProductDto productDtoSend= this.productMapper.entityToDto(product,listProductImagesDto);
+      ProductDto productDtoSend= productMapper.entityToDto(product,listProductImagesDto);
       return ResponseEntity.status(HttpStatus.OK).body(productDtoSend);
     }catch (JsonProcessingException e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ProductDto("Error al procesar JSON: " + e.getMessage()));
@@ -61,12 +61,12 @@ public class ProductServiceImpl implements ProductService{
 
   public ResponseEntity<ProductDto> updateProduct(Long id,ProductDto productDto) {
     try {
-      Optional<Product> product=productRepository.findById(id);
+      Optional<Product> product = productRepository.findById(id);
       if(product.isEmpty()){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ProductDto("Producto no encontrado"));
       }
       Product productDb = product.get();
-      Product updateProduct =  this.productMapper.entityUpdate(productDb,productDto);
+      Product updateProduct = productMapper.entityUpdate(productDb,productDto);
       productRepository.save(updateProduct);
       ProductDto productDtoSend = productMapper.entityToDtoUpdateProduct(updateProduct);
       return ResponseEntity.status(HttpStatus.OK).body(productDtoSend);
@@ -78,13 +78,11 @@ public class ProductServiceImpl implements ProductService{
   @Transactional
   public ResponseEntity<List<ProductImageDto>> updateImages(List<MultipartFile> images, Long productId) {
     try {
-      List<ProductImage> productImages = this.productImageService.findByProductIdAndStatusTrue(productId);
+      List<ProductImage> productImages = productImageService.findByProductIdAndStatusTrue(productId);
       if(productImages.isEmpty()){
-        List<ProductImageDto> listProductImageDto = new ArrayList<>();
-        listProductImageDto.add(new ProductImageDto("Imagenes no disponibles"));
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(listProductImageDto);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of(new ProductImageDto("Imagenes no disponibles")));
       }
-      Product product = this.productRepository.findByProductId(productId);
+      Product product = productRepository.findByProductId(productId);
       for(int i = 0;i<images.size();i++){
         MultipartFile image = images.get(i);
         ProductImage productImage = productImages.get(i);
@@ -92,14 +90,12 @@ public class ProductServiceImpl implements ProductService{
         String imageName = productName + "_" + productImage.getId();
         String imageUrl = this.cloudinaryService.updateFile(image,imageName);
         productImage.setImageUrl(imageUrl);
-        this.productImageService.save(productImage);
+        productImageService.save(productImage);
       }
       List<ProductImageDto> listProductImageDto= productImageMapper.entityListToDtoList(productImages);
       return ResponseEntity.status(HttpStatus.OK).body(listProductImageDto);
     }catch(Exception e){
-      List<ProductImageDto> listProductImageDto = new ArrayList<>();
-      listProductImageDto.add(new ProductImageDto(ERROR_INESPERADO + e.getMessage()));
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).body(listProductImageDto);
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).body(List.of(new ProductImageDto(ERROR_INESPERADO + e.getMessage())));
     }
   }
 
@@ -107,13 +103,13 @@ public class ProductServiceImpl implements ProductService{
     List<ProductImage> productImages = new ArrayList<>();
     for (MultipartFile image : images) {
       ProductImage productImage = new ProductImage();
-      productImage.setProduct(product);
-      this.productImageService.save(productImage);
+      productImage.setProduct(product.getId());
+      productImageService.save(productImage);
       String productName = product.getNombre().replace(" ","_");
       String imageName = productName + "_" + productImage.getId();
-      String imageUrl = this.cloudinaryService.uploadFile(image, imageName);
+      String imageUrl = cloudinaryService.uploadFile(image, imageName);
       productImage.setImageUrl(imageUrl);
-      this.productImageService.save(productImage);
+      productImageService.save(productImage);
       productImages.add(productImage);
     }
     return productImages;
@@ -121,38 +117,21 @@ public class ProductServiceImpl implements ProductService{
 
   public ResponseEntity<List<ProductDto>> findAllProduct() {
     try {
-      List<Product> listProduct = this.productRepository.findByStatusTrue();
+      List<Product> listProduct = productRepository.findByStatusTrue();
       if(listProduct.isEmpty()){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
       }
-      List<ProductDto> listProductDto = this.productMapper.entityListToDtoList(listProduct);
+      List<ProductDto> listProductDto = productMapper.entityListToDtoList(listProduct);
       return ResponseEntity.status(HttpStatus.OK).body(listProductDto);
     }catch(Exception e){
       return ResponseEntity.status(HttpStatus.NO_CONTENT).body(List.of());
     }
   }
 
-  public ResponseEntity<ProductDto> findById(Long id) {
-    ProductDto productDto = new ProductDto();
-    try {
-      Optional<Product> optionalProduct =this.productRepository.findByIdAndStatusTrue(id);
-      if(optionalProduct.isEmpty()){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(productDto);
-      }
-      Product productDb = optionalProduct.get();
-      List<ProductImage> listProductImage = productDb.getImagenes();
-      List<ProductImageDto> listProductImageDto = this.productImageMapper.entityListToDtoList(listProductImage);
-      productDto = this.productMapper.entityToDto(productDb,listProductImageDto);
-      return ResponseEntity.status(HttpStatus.OK).body(productDto);
-    }catch(Exception e){
-      return ResponseEntity.status(HttpStatus.NO_CONTENT).body(productDto);
-    }
-  }
-
-  public ResponseEntity<Map<String,String>> deleteProduct(Long id) {
+  public ResponseEntity<Map<String,String>> deleteProduct(ProductDto productDto) {
     Map<String, String> response = new HashMap<>();
     try {
-      Optional<Product> product = productRepository.findById(id);
+      Optional<Product> product = productRepository.findByNombreAndStatusTrue(productDto.getNombre());
       if(product.isEmpty()){
         response.put(MESSAGE,"Producto no encontrado");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

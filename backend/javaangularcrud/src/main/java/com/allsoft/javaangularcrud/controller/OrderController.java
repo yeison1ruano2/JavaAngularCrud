@@ -24,17 +24,17 @@ public class OrderController {
     return orderService.getAllOrders();
   }
 
-  @PostMapping("/order/user")
+  @PostMapping("/user")
   public ResponseEntity<List<OrderDto>> getOrderByUser(@RequestBody OrderRequest orderRequest){
     return orderService.getOrderByUser(orderRequest);
   }
 
-  @PostMapping("/order/product")
+  @PostMapping("/product")
   public ResponseEntity<List<OrderDto>> getOrderByProduct(@RequestBody ProductDto productDto){
     return orderService.getOrderByProduct(productDto);
   }
 
-  @PostMapping
+  @PostMapping("/create")
   public ResponseEntity<OrderDto> createOrder(@RequestBody OrderRequest orderRequest){
     return orderService.createOrder(orderRequest);
   }

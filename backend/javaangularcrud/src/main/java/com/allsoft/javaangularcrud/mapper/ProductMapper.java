@@ -3,16 +3,20 @@ package com.allsoft.javaangularcrud.mapper;
 import com.allsoft.javaangularcrud.dto.ProductDto;
 import com.allsoft.javaangularcrud.dto.ProductImageDto;
 import com.allsoft.javaangularcrud.entity.Product;
+import com.allsoft.javaangularcrud.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductMapper {
   private final ProductImageMapper productImageMapper;
+  private final ProductRepository productRepository;
 
-  public ProductMapper(ProductImageMapper productImageMapper) {
+  public ProductMapper(ProductImageMapper productImageMapper, ProductRepository productRepository) {
     this.productImageMapper = productImageMapper;
+    this.productRepository = productRepository;
   }
 
   public Product dtoToEntity(ProductDto productDto){
@@ -71,7 +75,9 @@ public class ProductMapper {
     return productDb;
   }
 
-  public ProductDto onlyEntityToDto(Product product) {
+  public ProductDto onlyEntityToDto(Long  productId) {
+    Optional<Product> optionalProduct = productRepository.findByNombreAndStatusTrue(productId.toString());
+    Product product = optionalProduct.get();
     return new ProductDto(
             product.getNombre(),
             product.getDescripcion(),

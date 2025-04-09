@@ -7,7 +7,6 @@ import com.allsoft.javaangularcrud.entity.OrderItem;
 import com.allsoft.javaangularcrud.entity.Product;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,15 +16,6 @@ public class OrderItemMapper {
   public OrderItemMapper(ProductMapper productMapper) {
     this.productMapper = productMapper;
   }
-
- /* public OrderItemDto entityToDto(OrderItem orderItem){
-    OrderItemDto orderDto = new OrderItemDto();
-    orderDto.setProductName(orderItem.getProduct().getNombre());
-    orderDto.setProductName(orderItem.getProduct().getNombre());
-    orderDto.setPrice(orderItem.getPrice());
-    orderDto.setQuantity(orderItem.getQuantity());
-    return orderDto;
-  }*/
 
   public OrderItem dtoToEntity(OrderItemDto orderItemDto){
     OrderItem orderItem = new OrderItem();
@@ -37,7 +27,7 @@ public class OrderItemMapper {
   public OrderItem createOrderItem(Order order, Product product, Integer quantity) {
     OrderItem orderItem = new OrderItem();
     orderItem.setOrder(order);
-    orderItem.setProduct(product);
+    orderItem.setProductId(product.getId());
     orderItem.setPrice(product.getPrecio());
     orderItem.setQuantity(quantity);
     return orderItem;
@@ -45,7 +35,7 @@ public class OrderItemMapper {
 
   public OrderItemDto entityToDto(OrderItem orderItem) {
     OrderItemDto orderItemDto = new OrderItemDto();
-    orderItemDto.setProductDto(productMapper.onlyEntityToDto(orderItem.getProduct()));
+    orderItemDto.setProductDto(productMapper.onlyEntityToDto(orderItem.getProductId()));
     orderItemDto.setQuantity(orderItem.getQuantity());
     orderItemDto.setPrice(orderItem.getPrice());
     return orderItemDto;
@@ -54,7 +44,7 @@ public class OrderItemMapper {
   public List<OrderItemDto> listEntityToDtoList(List<OrderItem> listOrderItemProduct) {
     return listOrderItemProduct.stream()
             .map(orderItem -> {
-              ProductDto productDto = productMapper.onlyEntityToDto(orderItem.getProduct());
+              ProductDto productDto = productMapper.onlyEntityToDto(orderItem.getProductId());
               OrderItemDto orderItemDto = new OrderItemDto();
               orderItemDto.setProductDto(productDto);
               orderItemDto.setQuantity(orderItem.getQuantity());

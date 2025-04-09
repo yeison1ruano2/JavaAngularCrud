@@ -16,7 +16,6 @@ public class AuthSellerController {
 
   private final UserService userService;
 
-
   public AuthSellerController(UserService userService) {
     this.userService = userService;
   }

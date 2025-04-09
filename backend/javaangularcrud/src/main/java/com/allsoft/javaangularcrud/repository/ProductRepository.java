@@ -17,8 +17,6 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
   @Query("SELECT p FROM Product p Where p.id=:id")
   Product findByProductId(@Param("id")Long id);
 
-  Optional<Product> findByIdAndStatusTrue(Long id);
-
   Optional<Product> findByNombreAndStatusTrue(String nombre);
 
   @Query("SELECT p FROM Product p " +
@@ -28,4 +26,5 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
           "AND (:categoria IS NULL OR p.categoria = :categoria) " +
           "ORDER BY p.precio DESC")
   List<Product> findByTerm(@Param("nombre") String nombre, @Param("marca") String marca, @Param("categoria") String categoria);
+
 }

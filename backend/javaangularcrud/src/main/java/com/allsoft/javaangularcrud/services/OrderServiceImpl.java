@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -44,26 +43,30 @@ public class OrderServiceImpl implements OrderService {
   public ResponseEntity<List<OrderDto>> getAllOrders() {
     try{
       List<Order> orders = orderRepository.findAll();
-      List<OrderDto> ordersDto = orders.stream()
-              .map(orderMapper::entityToDto)
-              .toList();
+      List<OrderDto> ordersDto =mapOrdersToDto(orders);
       return ResponseEntity.status(HttpStatus.OK).body(ordersDto);
     }catch (Exception e){
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of());
+      return handleInternalServerError();
     }
+  }
+
+  private List<OrderDto> mapOrdersToDto(List<Order> orders) {
+    return orders.stream()
+            .map(orderMapper::entityToDto)
+            .toList();
   }
 
   @Override
   public ResponseEntity<List<OrderDto>> getOrderByUser(OrderRequest orderRequest) {
     try {
-      List<Order> listOrderUser =  orderRepository.findOrderByUser(orderRequest.getUsername());
-      if(listOrderUser.isEmpty()){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of(new OrderDto("Usuario no encontrado")));
+      List<Order> orders =  orderRepository.findOrderByUser(orderRequest.getNombreUsuario());
+      if(orders.isEmpty()){
+        return handleNotFound("Usuario no encontrado");
       }
-      List<OrderDto> listOrderDto = orderMapper.entityListToDtoList(listOrderUser);
+      List<OrderDto> listOrderDto = mapOrdersToDto(orders);
       return ResponseEntity.status(HttpStatus.OK).body(listOrderDto);
     }catch(Exception e){
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of());
+      return handleInternalServerError();
     }
   }
 
@@ -72,19 +75,19 @@ public class OrderServiceImpl implements OrderService {
     try {
       Optional<Product> optionalProduct =  productRepository.findByNombreAndStatusTrue(productDto.getNombre());
       if(optionalProduct.isEmpty()){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of(new OrderDto("Producto no encontrado")));
+        return handleNotFound("producto no encontrado");
       }
       Product product = optionalProduct.get();
-      List<OrderItem> listOrderItemProduct =  orderItemRepository.findByProduct(product.getId());
-      List<Order> listOrder =   listOrderItemProduct.stream()
-              .map(orderItem -> {
-                return orderRepository.findOrderById(orderItem.getOrder().getId());
-              }).toList();
-      List<OrderItemDto> listOrderItemDto =  orderItemMapper.listEntityToDtoList(listOrderItemProduct);
-      List<OrderDto> listOrderDto = orderMapper.entityListToDtoListOrderItem(listOrder,listOrderItemDto);
-      return ResponseEntity.status(HttpStatus.OK).body(listOrderDto);
+      List<OrderItem> orderItems =  orderItemRepository.findByProduct(product.getId());
+      List<OrderDto> orderDtos = new ArrayList<>();
+      for(OrderItem orderItem: orderItems){
+        Order order = orderRepository.findOrderById(orderItem.getOrder().getId());
+        OrderDto orderDto = orderMapper.mapOrderToDto(order,orderItem);
+        orderDtos.add(orderDto);
+      }
+      return ResponseEntity.status(HttpStatus.OK).body(orderDtos);
     }catch(Exception e){
-      return ResponseEntity.status(HttpStatus.OK).body(null);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
     }
   }
 
@@ -93,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
   public ResponseEntity<OrderDto> createOrder(OrderRequest orderRequest) {
     try {
       Order order = new Order();
-      Optional<User> optionalUser = userRepository.findByUsername(orderRequest.getUsername());
+      Optional<User> optionalUser = userRepository.findByUsername(orderRequest.getNombreUsuario());
       if(optionalUser.isEmpty()){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new OrderDto("Usuario no encontrado"));
       }
@@ -113,23 +116,21 @@ public class OrderServiceImpl implements OrderService {
   private List<OrderItem> createOrderItems(List<OrderItemRequest> items,Order order) {
     List<OrderItem> orderItems = new ArrayList<>();
     for(OrderItemRequest item: items){
-      Optional<Product> optionalProduct = productRepository.findByNombreAndStatusTrue(item.getProductName());
-      Product product = optionalProduct.get();
-      OrderItem orderItem = orderItemMapper.createOrderItem(order,product,item.getQuantity());
+      Optional<Product> product = productRepository.findByNombreAndStatusTrue(item.getProductName());
+      if(product.isEmpty()){
+        return List.of();
+      }
+      OrderItem orderItem = orderItemMapper.createOrderItem(order,product.get(),item.getQuantity());
       orderItems.add(orderItem);
     }
     return orderItems;
   }
 
-  @Override
-  public ResponseEntity<OrderDto> updateOrder(Long id, OrderDto orderDto) {
-    return null;
+  private ResponseEntity<List<OrderDto>> handleInternalServerError() {
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(List.of());
   }
 
-  @Override
-  public ResponseEntity<Map<String, String>> deleteOrder(Long id) {
-    return null;
+  private ResponseEntity<List<OrderDto>> handleNotFound(String message) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of(new OrderDto(message)));
   }
-
-
 }

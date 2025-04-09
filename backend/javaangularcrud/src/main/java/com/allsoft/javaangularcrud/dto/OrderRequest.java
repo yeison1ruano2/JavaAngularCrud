@@ -5,7 +5,7 @@ import java.util.List;
 public class OrderRequest {
   private List<OrderItemRequest> items;
   private Double totalAmount;
-  private String username;
+  private String nombreUsuario;
 
 
   public List<OrderItemRequest> getItems() {
@@ -24,11 +24,11 @@ public class OrderRequest {
     this.totalAmount = totalAmount;
   }
 
-  public String getUsername() {
-    return username;
+  public String getNombreUsuario() {
+    return nombreUsuario;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
+  public void setNombreUsuario(String nombreUsuario) {
+    this.nombreUsuario = nombreUsuario;
   }
 }

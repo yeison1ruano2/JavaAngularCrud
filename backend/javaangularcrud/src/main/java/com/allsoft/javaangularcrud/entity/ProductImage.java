@@ -11,10 +11,10 @@ public class ProductImage {
 
   private String imageUrl;
 
-  @ManyToOne
+  //@ManyToOne
   @JoinColumn(name = "product_id", nullable = false)
   @JsonBackReference
-  private Product product;
+  private Long productId;
 
   public ProductImage() {
   }
@@ -35,16 +35,16 @@ public class ProductImage {
     this.imageUrl = imageUrl;
   }
 
-  public Product getProduct() {
-    return product;
+  public Long getProduct() {
+    return productId;
   }
 
-  public void setProduct(Product product) {
-    this.product = product;
+  public void setProduct(Long product) {
+    this.productId = product;
   }
 
-  public ProductImage(String imageUrl, Product product) {
+  public ProductImage(String imageUrl, Long productId) {
     this.imageUrl = imageUrl;
-    this.product = product;
+    this.productId = productId;
   }
 }
